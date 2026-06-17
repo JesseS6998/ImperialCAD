@@ -3,7 +3,7 @@ local lastCoords = nil
 local lastSend = 0
 
 local minMoveDistance = 20.0
-local maxRefreshMs = Config.locationFrequency
+local maxRefreshMs = Config.locationFrequency * 1000
 
 CreateThread(function()
     while true do
