@@ -45,11 +45,19 @@ RegisterNetEvent('ImperialLocation:updateNearest')
 AddEventHandler('ImperialLocation:updateNearest', function(playerCoords, shouldDisplay)
     local src = source
     local ped = GetPlayerPed(src)
-    local coords = playerCoords
+    local coords = nil
 
     if ped and ped ~= 0 then
         local serverCoords = GetEntityCoords(ped)
-        coords = {x = serverCoords.x, y = serverCoords.y}
+        coords = {
+            x = serverCoords.x,
+            y = serverCoords.y
+        }
+    elseif playerCoords and playerCoords.x and playerCoords.y then
+        coords = {
+            x = tonumber(playerCoords.x),
+            y = tonumber(playerCoords.y)
+        }
     end
 
     if not coords or not coords.x or not coords.y then
@@ -61,15 +69,23 @@ AddEventHandler('ImperialLocation:updateNearest', function(playerCoords, shouldD
     local nearestCity = getNearestLocation(coords, cities)
     local nearestCounty = getNearestLocation(coords, counties)
 
+    local oldData = playerLocationData[src]
+    local locationChanged = not oldData
+        or (oldData.postal and oldData.postal.code) ~= (nearestPostal and nearestPostal.code)
+        or (oldData.city and oldData.city.city) ~= (nearestCity and nearestCity.city)
+        or (oldData.county and oldData.county.county) ~= (nearestCounty and nearestCounty.county)
+
     playerLocationData[src] = {
         postal = nearestPostal,
         city = nearestCity,
         county = nearestCounty
     }
 
-    TriggerClientEvent('ImperialLocation:receiveNearest', src, nearestPostal, nearestCity, nearestCounty)
+    if locationChanged then
+        TriggerClientEvent('ImperialLocation:receiveNearest', src, nearestPostal, nearestCity, nearestCounty)
+    end
 
-     if shouldDisplay then
+    if shouldDisplay then
         TriggerClientEvent('ImperialLocation:PrintNearest', src, nearestPostal, nearestCity, nearestCounty)
     end
 end)
