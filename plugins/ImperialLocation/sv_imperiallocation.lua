@@ -24,20 +24,25 @@ end
 
 local postals, cities, counties = loadData(POSTAL_FILE), loadData(CITY_FILE), loadData(COUNTY_FILE)
 
-local function calculateDistance(x1, y1, x2, y2)
-    return math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+local function calculateDistanceSquared(x1, y1, x2, y2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    return dx * dx + dy * dy
 end
 
 local function getNearestLocation(coords, locations)
     local nearest = nil
-    local shortestDistance = math.huge
+    local shortestDistSq = math.huge
+
     for _, location in ipairs(locations) do
-        local distance = calculateDistance(coords.x, coords.y, location.x, location.y)
-        if distance < shortestDistance then
+        local distSq = calculateDistanceSquared(coords.x, coords.y, location.x, location.y)
+
+        if distSq < shortestDistSq then
             nearest = location
-            shortestDistance = distance
+            shortestDistSq = distSq
         end
     end
+
     return nearest
 end
 
