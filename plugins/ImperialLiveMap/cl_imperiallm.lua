@@ -3,7 +3,7 @@ if not Config.livemap then return end
 local lastCoords = nil
 local lastSend = 0
 local SEND_INTERVAL = 10000
-local MIN_MOVE_DISTANCE = 10.0
+local minMoveD = 10.0
 local tracking = false
 
 local function SetTracking(enabled)
